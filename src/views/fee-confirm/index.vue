@@ -102,13 +102,13 @@ export default {
   },
   methods: {
     async onSubmit() {
-      if (!formValidator(this.addForm)) return;
-      const res = await Apis.confirmationAgentAmount(this.addForm);
-      await this.$store.commit("setUserInfo", {
-        videoType: "001",
-        userIdNo: this.addForm.userIdNo
-      });
-      await this.$store.commit("setStashInfo", res.data);
+      // if (!formValidator(this.addForm)) return;
+      // const res = await Apis.confirmationAgentAmount(this.addForm);
+      // await this.$store.commit("setUserInfo", {
+      //   videoType: "001",
+      //   userIdNo: this.addForm.userIdNo
+      // });
+      // await this.$store.commit("setStashInfo", res.data);
       this.$router.push({
         path: "/video-recording",
         query: {
@@ -118,8 +118,7 @@ export default {
             `确保您的权益谈话有录像请谅解，您介绍自己亲友姓名${this.addForm.userName}，身份证号码${this.addForm.userIdNo}，作为贷款人委托扬州万融商务咨询有限公司提供居间服务到银行或者机构办理贷款，您自愿按照合同约定代为支付亲友贷款的中介费用，费用为贷款总额的2%，我司是贷款中介公司不是银行提供的是中介服务。您支付的费用是我司给您朋友贷款的单纯中介费用，跟其他任何费用无关，对于合同内容您都正确理解，对于费用确认无误。并且愿意为此承担一切纠纷与责任，对吗？`,
             "面签已完成，非常感谢您的配合。"
           ])
-        },
-        recordTime: 15
+        }
       });
     },
     confirmDate(value) {

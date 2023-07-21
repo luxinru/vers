@@ -15,8 +15,9 @@
     <van-swipe
       v-if="countdown === 0"
       class="swipe"
+      :class="{ bottom: !nextQuestion }"
+      ref="swipe"
       :show-indicators="false"
-      :autoplay="(recordTime / tips.length) * 1000"
       :loop="false"
       :touchable="false"
     >
@@ -26,6 +27,12 @@
         </div>
       </van-swipe-item>
     </van-swipe>
+
+    <div v-if="nextQuestion" class="btn" @click="question">
+      {{ nameButton }}
+    </div>
+
+    <audio :src="audioSrc" ref="audioRef" autoplay></audio>
   </div>
 </template>
 
@@ -34,7 +41,7 @@ import RecordRTC from "recordrtc";
 
 import Vue from "vue";
 import { Swipe, SwipeItem } from "vant";
-import { Notify } from "vant";
+import { Notify, Toast } from "vant";
 
 Vue.use(Swipe);
 Vue.use(SwipeItem);
@@ -43,6 +50,20 @@ import { Apis } from "@/apis";
 export default {
   name: "videoRecording",
 
+  data() {
+    return {
+      nameButton: "开始提问",
+      recordRTC: null,
+      stream: null,
+      countdown: 3, // 倒计时
+      isAction: false, // 是否开始动画
+      audioSrc: "",
+      value: "",
+      index: 0,
+      nextQuestion: false
+    };
+  },
+
   computed: {
     tips() {
       return JSON.parse(this.$route.query.tips);
@@ -50,24 +71,13 @@ export default {
 
     type() {
       return this.$route.query.type;
-    },
-
-    recordTime() {
-      return Number(this.$route.recordTime) || 15;
     }
   },
 
-  data() {
-    return {
-      recordRTC: null,
-      stream: null,
-      countdown: 3, // 倒计时
-      isAction: false // 是否开始动画
-    };
-  },
-
   mounted() {
-    this.initCamera();
+    this.audioSrc = this.$store.state.stashInfo[0].audioSrc;
+    this.startCountDown();
+    // this.initCamera();
   },
 
   methods: {
@@ -82,6 +92,7 @@ export default {
         videoElement.srcObject = this.stream;
 
         this.isAction = true;
+        this.startRecording();
         this.startCountDown();
       } catch (error) {
         Notify({
@@ -92,6 +103,11 @@ export default {
     },
 
     async stopRecording(superBuffer) {
+      Toast.loading({
+        message: "视频上传中，请稍后",
+        forbidClick: true
+      });
+
       // 创建一个File对象
       const recordedFile = new File([superBuffer], "recordedVideo.webm", {
         type: "video/webm"
@@ -104,6 +120,8 @@ export default {
       formData.append("userIdNo", this.$store.state.userInfo.userIdNo);
       await Apis.uploadVideo(formData);
 
+      Toast.clear();
+
       Notify({ type: "success", message: "上传成功！" });
 
       this.$router.go("-1");
@@ -114,7 +132,7 @@ export default {
         this.countdown--;
         if (this.countdown === 0) {
           clearInterval(timer);
-          this.startRecording();
+          this.nextQuestion = true;
         }
       }, 1000);
     },
@@ -124,14 +142,25 @@ export default {
         type: "video"
       });
       this.recordRTC.startRecording();
+    },
 
-      setTimeout(() => {
-        this.recordRTC.stopRecording(async () => {
-          let recordedBlob = this.recordRTC.getBlob();
-          // 这里你可以将 recordedBlob 上传到服务器
-          this.stopRecording(recordedBlob);
-        });
-      }, this.recordTime * 1000);
+    question() {
+      this.nameButton = "下一个问题";
+      // this.$refs.swipe.next();
+      this.value = this.$store.state.stashInfo[this.index].text;
+      this.audioSrc = this.$store.state.stashInfo[this.index].audioUrl;
+      this.$refs.audioRef.play();
+      if (this.index < this.$store.state.stashInfo.length - 1) {
+        this.index = this.index + 1;
+      } else {
+        this.nextQuestion = false;
+
+        // this.recordRTC.stopRecording(async () => {
+        //   let recordedBlob = this.recordRTC.getBlob();
+        //   // 这里你可以将 recordedBlob 上传到服务器
+        //   this.stopRecording(recordedBlob);
+        // });
+      }
     }
   }
 };
@@ -193,9 +222,10 @@ export default {
 
   .swipe {
     position: absolute;
-    bottom: 46px;
+    bottom: 188px;
     width: 686px;
     margin: 0 auto;
+    transition: all 0.3s ease-in-out;
 
     /deep/ .van-swipe__track {
       align-items: flex-end;
@@ -214,6 +244,33 @@ export default {
       color: #000000;
       line-height: 48px;
     }
+  }
+
+  .bottom {
+    bottom: 46px;
+  }
+
+  .btn {
+    position: absolute;
+    bottom: 46px;
+    width: 656px;
+    height: 96px;
+    background: #3785fb;
+    border-radius: 16px;
+    font-size: 32px;
+    font-family: PingFang SC-Semibold, PingFang SC;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  audio {
+    width: 0;
+    height: 0;
+    opacity: 0;
   }
 }
 </style>
