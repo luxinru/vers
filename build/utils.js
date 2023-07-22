@@ -47,6 +47,7 @@ exports.cssLoaders = function (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
+        publicPath: '../../', // 解决css中引入图片路径不对的问题
         fallback: 'vue-style-loader'
       })
     } else {
