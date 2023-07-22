@@ -54,7 +54,7 @@ export default {
 
 <style lang="less">
 .login {
-  background-image: url("~@/assets/img/bg.png");
+  background-image: url("../../assets/img/bg.png");
   background-size: 100%;
   width: 100vw;
   height: 100vh;
