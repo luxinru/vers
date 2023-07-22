@@ -32,7 +32,7 @@
       {{ nameButton }}
     </div>
 
-    <audio :src="audioSrc" ref="audioRef" autoplay></audio>
+    <audio id="audio" :src="audioSrc" ref="audioRef" autoplay></audio>
   </div>
 </template>
 
@@ -55,6 +55,7 @@ export default {
       nameButton: "开始提问",
       recordRTC: null,
       stream: null,
+      audioStream: null,
       countdown: 3, // 倒计时
       isAction: false, // 是否开始动画
       audioSrc: "",
@@ -88,6 +89,11 @@ export default {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
         const videoElement = document.querySelector("video");
         videoElement.srcObject = this.stream;
+
+        // 假设你的音频是通过一个 `<audio>` 元素播放的
+        let audioElement = document.querySelector("audio");
+        // 获取音频的 MediaStream
+        this.audioStream = audioElement.captureStream();
 
         this.isAction = true;
         this.startRecording();
@@ -136,15 +142,21 @@ export default {
     },
 
     startRecording() {
-      this.recordRTC = RecordRTC(this.stream, {
+      // 创建一个新的 MediaStream
+      let combinedStream = new MediaStream([
+        ...this.stream.getVideoTracks(),
+        ...this.audioStream.getAudioTracks()
+      ]);
+
+      this.recordRTC = RecordRTC(combinedStream, {
         type: "video"
       });
       this.recordRTC.startRecording();
     },
 
     question() {
-      if (this.nameButton !== '开始提问') {
-        this.$refs.swipe.next()
+      if (this.nameButton !== "开始提问") {
+        this.$refs.swipe.next();
       }
       this.nameButton = "下一个问题";
       this.audioSrc = this.$store.state.stashInfo[this.index].audioUrl;
