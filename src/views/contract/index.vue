@@ -56,17 +56,10 @@ export default {
       const res = await Apis.confirmationContractAmount(this.addForm);
       await this.$store.commit("setStashInfo", res.data)
 
-      const date = moment().format('YYYY年MM月DD日')
-
       this.$router.push({
         path: "/video-recording",
         query: {
-          type: "003",
-          tips: JSON.stringify([
-            `请问你是${this.addForm.userName}，身份证号码是${this.addForm.userIdNo}本人，对吗？`,
-            `确保您的权益谈话有录像请谅解，您这边自愿于${date}委托扬州万融商务咨询有限公司提供居间服务，到银行或者相关机构申请贷款申请，资料都由您本人提供，并且确保真实对吗？`,
-            "我司是贷款信息居间服务公司，不是银行提供的，是贷款信息之间中介服务，居间服务费用为实际贷款总额度的7%，合同由您自愿签署，您支付的全额之间费用是我司单纯的中介费用跟其他包括，但不限于支付银行或者机构的本金及利息等费用无关，对于合同内容您都完全正确理解，不存在任何误解了对吗？"
-          ])
+          type: "003"
         }
       });
     },

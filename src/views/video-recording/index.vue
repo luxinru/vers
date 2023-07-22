@@ -23,7 +23,7 @@
     >
       <van-swipe-item v-for="(item, index) in tips" :key="index">
         <div class="tips">
-          {{ item }}
+          {{ item.text }}
         </div>
       </van-swipe-item>
     </van-swipe>
@@ -58,7 +58,6 @@ export default {
       countdown: 3, // 倒计时
       isAction: false, // 是否开始动画
       audioSrc: "",
-      value: "",
       index: 0,
       nextQuestion: false
     };
@@ -66,7 +65,7 @@ export default {
 
   computed: {
     tips() {
-      return JSON.parse(this.$route.query.tips);
+      return this.$store.state.stashInfo;
     },
 
     type() {
@@ -76,8 +75,7 @@ export default {
 
   mounted() {
     this.audioSrc = this.$store.state.stashInfo[0].audioSrc;
-    this.startCountDown();
-    // this.initCamera();
+    this.initCamera();
   },
 
   methods: {
@@ -145,9 +143,10 @@ export default {
     },
 
     question() {
+      if (this.nameButton !== '开始提问') {
+        this.$refs.swipe.next()
+      }
       this.nameButton = "下一个问题";
-      // this.$refs.swipe.next();
-      this.value = this.$store.state.stashInfo[this.index].text;
       this.audioSrc = this.$store.state.stashInfo[this.index].audioUrl;
       this.$refs.audioRef.play();
       if (this.index < this.$store.state.stashInfo.length - 1) {
@@ -155,11 +154,11 @@ export default {
       } else {
         this.nextQuestion = false;
 
-        // this.recordRTC.stopRecording(async () => {
-        //   let recordedBlob = this.recordRTC.getBlob();
-        //   // 这里你可以将 recordedBlob 上传到服务器
-        //   this.stopRecording(recordedBlob);
-        // });
+        this.recordRTC.stopRecording(async () => {
+          let recordedBlob = this.recordRTC.getBlob();
+          // 这里你可以将 recordedBlob 上传到服务器
+          this.stopRecording(recordedBlob);
+        });
       }
     }
   }

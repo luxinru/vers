@@ -112,12 +112,7 @@ export default {
       this.$router.push({
         path: "/video-recording",
         query: {
-          type: "001",
-          tips: JSON.stringify([
-            `请问你是${this.addForm.agentName}，身份证号码是${this.addForm.agentIdNo}本人，对吗？`,
-            `确保您的权益谈话有录像请谅解，您介绍自己亲友姓名${this.addForm.userName}，身份证号码${this.addForm.userIdNo}，作为贷款人委托扬州万融商务咨询有限公司提供居间服务到银行或者机构办理贷款，您自愿按照合同约定代为支付亲友贷款的中介费用，费用为贷款总额的2%，我司是贷款中介公司不是银行提供的是中介服务。您支付的费用是我司给您朋友贷款的单纯中介费用，跟其他任何费用无关，对于合同内容您都正确理解，对于费用确认无误。并且愿意为此承担一切纠纷与责任，对吗？`,
-            "面签已完成，非常感谢您的配合。"
-          ])
+          type: "001"
         }
       });
     },

@@ -75,7 +75,9 @@ import moment from "moment";
 
 export default {
   name: "message",
+  
   components: { AppNavBar },
+
   data() {
     return {
       addForm: {
@@ -90,24 +92,17 @@ export default {
       showCalendar: false
     };
   },
+
   methods: {
     async onSubmit() {
       if (!formValidator(this.addForm)) return;
       const res = await Apis.notificationLoanLiability(this.addForm);
       await this.$store.commit("setStashInfo", res.data);
 
-      const date = moment().format('YYYY年MM月DD日')
-
       this.$router.push({
         path: "/video-recording",
         query: {
-          type: "002",
-          tips: JSON.stringify([
-            `请问你是${this.addForm.userName}，身份证号码是${this.addForm.userIdNo}本人，对吗？`,
-            `确保您的权益谈话有录像，请谅解，您这边自愿于${date}委托扬州万融商务咨询有限公司提供居间服务到相关机构或者银行申请贷款，贷款资料都确保是您本人自愿提供，贷款是您单独所贷，您作为贷款人，贷款会上您的征信，贷款是通过您这边银行卡来还款，您将会自己承担全额的贷款责任与风险相关合同都是您本人自愿签订，以上内容您都是自愿并清楚的，对吗？`,
-            "温馨提示，我司只提供居间服务，不做额外的其他承诺，贷款到账以后，你有合法自由支配的权利，后期要按照贷款合同约定按时归还贷款，并知晓由本人偿还，清楚明白若贷款逾期未归还，将被记录在自己个人征信上对于银行贷款用途您都清楚了解。以及其他所有事项都正确理解并且确认无误了，对吗？",
-            "面签已完成，非常感谢您的配合。"
-          ])
+          type: "002"
         }
       });
     },
