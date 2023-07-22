@@ -102,13 +102,13 @@ export default {
   },
   methods: {
     async onSubmit() {
-      // if (!formValidator(this.addForm)) return;
-      // const res = await Apis.confirmationAgentAmount(this.addForm);
-      // await this.$store.commit("setUserInfo", {
-      //   videoType: "001",
-      //   userIdNo: this.addForm.userIdNo
-      // });
-      // await this.$store.commit("setStashInfo", res.data);
+      if (!formValidator(this.addForm)) return;
+      const res = await Apis.confirmationAgentAmount(this.addForm);
+      await this.$store.commit("setUserInfo", {
+        videoType: "001",
+        userIdNo: this.addForm.userIdNo
+      });
+      await this.$store.commit("setStashInfo", res.data);
       this.$router.push({
         path: "/video-recording",
         query: {
